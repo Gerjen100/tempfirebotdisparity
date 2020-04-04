@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Disparity</title>
+  <style>
+  #controls{
+      position: absolute;
+      top:0;
+      left:20px;
+      z-index:10;
+  }
+  SVG{
+      position:absolute;
+      top:0;
+      z-index:-1
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script> 
+  <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+
+  <!--script src="./timer.js"></script>-->
+  <script type="text/javascript" lang="javascript">
+    YUI({}).use('slider',  function (Y) {
+        var t_slider = new Y.Slider({      
+            axis    : 'x',
+        min     : 1,
+        max     : 500,
+        value   : 100,
+        length  : '150px'});
+
+        t_slider.render("#controls");
+    // The Node and Event modules are loaded and ready to use.
+    // Your code goes here!
+    });
+    var textsize = 200
+    SVG.on(document, 'DOMContentLoaded', function() {
+        //    var draw = SVG().addTo('body')
+        var draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight)
+            rect = draw.rect(1, window.innerHeight-10).
+                    attr({ fill: '#f06' })
+        var text = draw.text("STOP")
+        text.move(window.innerWidth/2,(-textsize+window.innerHeight/2)).
+                font({ fill: '#fff', family: 'sans-serif' , size:textsize,textLength:window.innerWidth*0.8, anchor:"middle"}).
+                attr({visibility:"hidden"})
+        rect.animate({duration:60000}).ease("-").
+            attr({width:window.innerWidth})
+        text.animate({duration:200,delay:60000}).
+            attr({visibility:"visible"})
+//            screenupdater = setTimeout(UpdateScreen(),100)
+        
+    })
+</script>
+
+</head>
+<body style="margin:0;overflow-y: hidden" class="yui3-skin-sam"  >
+    <div id="controls" >
+    <span class="yui3-widget yui3-sliderbase yui-slider">
+        <!-- contentBox -->
+        <span class="yui3-slider-content yui3-slider-x"><!-- or slider-y -->
+    
+            <!-- rail -->
+            <span class="yui3-slider-rail">
+                <span class="yui3-slider-rail-cap-left"></span><!-- or cap-top -->
+                <span class="yui3-slider-rail-cap-right"></span><!-- or cap-bottom -->
+    
+                <!-- thumb -->
+                <span class="yui3-slider-thumb">
+                    <img class="yui3-slider-thumb-shadow">
+                    <img class="yui3-slider-thumb-image">
+                </span>
+            </span>
+    
+        </span>
+    </span>
+    </div>
+
+</body>
+</html>
