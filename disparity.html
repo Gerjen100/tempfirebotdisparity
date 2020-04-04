@@ -67,8 +67,8 @@
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight);
             var cam1 = draw.circle(20).fill('#333').move(20, 20).id('cam1')
             var cam2 = draw.circle(20).fill('#333').move(20, 20).id('cam2')
-            var vangle1 = draw.path("M0,0 l200,-100 a200,200 0 0,1 0,200  z")
-            vangle1.stroke({ color: '#f06', width: 4, linecap: 'round', linejoin: 'round' }).fill({color:'#333', opacity:'30%'}).id('vangle1')
+            var vangle1 = draw.path("M20,0 l200,-100 a200,200 0 0,1 0,200  z")
+            vangle1.stroke({ color: '#f06', width: 0, linecap: 'round', linejoin: 'round' }).fill({color:'#333', opacity:'30%'}).id('vangle1')
             var vangle2 = vangle1.clone()
             draw.add(vangle2)
             vangle2.id('vangle2')
