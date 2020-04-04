@@ -1,78 +1,115 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Disparity</title>
-  <style>
-  #controls{
-      position: absolute;
-      top:0;
-      left:20px;
-      z-index:10;
-  }
-  SVG{
-      position:absolute;
-      top:0;
-      z-index:-1
-  }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script> 
-  <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+    <title>Disparity</title>
+    <style>
+        #controls {
+            position: absolute;
+            top: 5px;
+            left: 20px;
+            z-index: 10;
+        }
 
-  <!--script src="./timer.js"></script>-->
-  <script type="text/javascript" lang="javascript">
-    YUI({}).use('slider',  function (Y) {
-        var t_slider = new Y.Slider({      
-            axis    : 'x',
-        min     : 1,
-        max     : 500,
-        value   : 100,
-        length  : '150px'});
+        SVG {
+            position: absolute;
+            top: 0;
+            z-index: -1
+        }
 
-        t_slider.render("#controls");
-    // The Node and Event modules are loaded and ready to use.
-    // Your code goes here!
-    });
-    var textsize = 200
-    SVG.on(document, 'DOMContentLoaded', function() {
-        //    var draw = SVG().addTo('body')
-        var draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight)
-            rect = draw.rect(1, window.innerHeight-10).
-                    attr({ fill: '#f06' })
-        var text = draw.text("STOP")
-        text.move(window.innerWidth/2,(-textsize+window.innerHeight/2)).
-                font({ fill: '#fff', family: 'sans-serif' , size:textsize,textLength:window.innerWidth*0.8, anchor:"middle"}).
-                attr({visibility:"hidden"})
-        rect.animate({duration:60000}).ease("-").
-            attr({width:window.innerWidth})
-        text.animate({duration:200,delay:60000}).
-            attr({visibility:"visible"})
-//            screenupdater = setTimeout(UpdateScreen(),100)
-        
-    })
-</script>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 20%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            position: absolute;
+            top: 5px;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+    <script lang="javascript">
+        var textsize = 200
+        var draw
+        SVG.on(document, 'DOMContentLoaded', function () {
+            // var draw = SVG().addTo('body')
+            
+            draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight);
+            var cam1 = draw.circle(20).fill('#333').move(20, 20).id('cam1')
+            var cam2 = draw.circle(20).fill('#333').move(20, 20).id('cam2')
+            var vangle1 = draw.path("M0,0 l200,-100 a200,200 0 0,1 0,200  z")
+            vangle1.stroke({ color: '#f06', width: 4, linecap: 'round', linejoin: 'round' }).fill({color:'#333', opacity:'30%'}).id('vangle1')
+            var vangle2 = vangle1.clone()
+            draw.add(vangle2)
+            vangle2.id('vangle2')
+            var slider = document.getElementById("myRange");
+            var output = document.getElementById("demo");
+
+            updateScreen(SVG(draw));
+
+            slider.oninput = function () {
+                
+                updateScreen(SVG(draw));
+            }
+
+
+        })
+
+
+
+        function updateScreen(drawsvg) {
+            
+            var output = document.getElementById("demo");
+            var slider = document.getElementById("myRange");
+            var slidevalue = output.innerHTML = slider.value;
+            drawsvg.find('circle#cam1').cy((window.innerHeight/2)-slidevalue)
+            drawsvg.find('circle#cam2').cy((window.innerHeight/2)+slidevalue*1)
+            drawsvg.find('path#vangle1').cy(drawsvg.find('circle#cam1').cy()[0])
+            drawsvg.find('path#vangle2').cy(drawsvg.find('circle#cam2').cy()[0])
+            //document.getElementById('cam1').cx(slider.value)
+            //draw.element('cam2').cy(slider.value)
+            // screenupdater = setTimeout(UpdateScreen(),100)
+        }
+    </script>
 
 </head>
-<body style="margin:0;overflow-y: hidden" class="yui3-skin-sam"  >
-    <div id="controls" >
-    <span class="yui3-widget yui3-sliderbase yui-slider">
-        <!-- contentBox -->
-        <span class="yui3-slider-content yui3-slider-x"><!-- or slider-y -->
-    
-            <!-- rail -->
-            <span class="yui3-slider-rail">
-                <span class="yui3-slider-rail-cap-left"></span><!-- or cap-top -->
-                <span class="yui3-slider-rail-cap-right"></span><!-- or cap-bottom -->
-    
-                <!-- thumb -->
-                <span class="yui3-slider-thumb">
-                    <img class="yui3-slider-thumb-shadow">
-                    <img class="yui3-slider-thumb-image">
-                </span>
-            </span>
-    
-        </span>
-    </span>
+
+<body style="margin:0;overflow-y: hidden">
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        <p>Value: <span id="demo" style="position: relative;"></span></p>
     </div>
 
 </body>
+
 </html>
