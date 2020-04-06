@@ -17,6 +17,12 @@
             z-index: -1
         }
 
+        #vangle1, #vangle2{
+            visibility: hidden;
+        }
+
+        
+
         .slidecontainer {
             width: 100%;
         }
@@ -59,33 +65,57 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
     <script lang="javascript">
+        //slider from: https://www.w3schools.com/howto/howto_js_rangeslider.asp
         var textsize = 200
         var draw
         SVG.on(document, 'DOMContentLoaded', function () {
             // var draw = SVG().addTo('body')
             
-            draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight);
+            draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
             var cam1 = draw.circle(20).fill('#333').move(20, 20).id('cam1')
             var cam2 = draw.circle(20).fill('#333').move(20, 20).id('cam2')
             var vangle1 = draw.path("M20,0 l200,-100 a200,200 0 0,1 0,200  z")
             vangle1.stroke({ color: '#f06', width: 0, linecap: 'round', linejoin: 'round' }).fill({color:'#333', opacity:'30%'}).id('vangle1')
-            var vangle2 = vangle1.clone()
-            draw.add(vangle2)
-            vangle2.id('vangle2')
+            var vangle2 = vangle1.clone().id('vangle2').addTo(draw)
+            //draw.add(vangle2)
+
+
+            var measure_line1 = draw.line(30,0,100,100).stroke({width:1, color:'#A00'}).move(cam1.x,cam1.y).id('ml1')
+
+            var measure_line2 = draw.line(30,0,100,100).stroke({width:1, color:'#A00'}).move(cam1.x,cam1.y).id('ml2')
+
+            createNestedLines(50,50,'nl1')
+            createNestedLines(50,50,'nl2')
+
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
 
             updateScreen(SVG(draw));
+
+            var canvas = document.getElementById("canvas")
+            canvas.onmousemove = function(event){
+                var x = event.x;
+                var y = event.y;
+                measure_line1.plot(30,draw.find('circle#cam1').cy()[0],x,y)
+                measure_line2.plot(30,draw.find('circle#cam2').cy()[0],x,y)
+            }
 
             slider.oninput = function () {
                 
                 updateScreen(SVG(draw));
             }
 
-
         })
 
-
+        function createNestedLines(fov,no_lines,id){
+            var nested = draw.nested().id(id)
+            var strokelength = window.innerWidth
+            initial_y = window.innerHeight/2
+            for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
+            {
+                nested.line(30,initial_y,strokelength+30,initial_y).stroke({width:1, color:'#888'}).rotate(angle,30,initial_y).addTo(nested)
+            }
+        }
 
         function updateScreen(drawsvg) {
             
@@ -96,6 +126,10 @@
             drawsvg.find('circle#cam2').cy((window.innerHeight/2)+slidevalue*1)
             drawsvg.find('path#vangle1').cy(drawsvg.find('circle#cam1').cy()[0])
             drawsvg.find('path#vangle2').cy(drawsvg.find('circle#cam2').cy()[0])
+            drawsvg.find('line#ml1').y(drawsvg.find('circle#cam1').cy()[0])
+            drawsvg.find('line#ml2').y(drawsvg.find('circle#cam2').cy()[0])
+            drawsvg.find('#nl1').cy(drawsvg.find('circle#cam1').cy()[0]-window.innerHeight/2)
+            drawsvg.find('#nl2').cy(drawsvg.find('circle#cam2').cy()[0]-window.innerHeight/2)
             //document.getElementById('cam1').cx(slider.value)
             //draw.element('cam2').cy(slider.value)
             // screenupdater = setTimeout(UpdateScreen(),100)
