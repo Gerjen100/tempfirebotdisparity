@@ -13,6 +13,7 @@
 
         SVG {
             position: absolute;
+            overflow: visible;
             top: 0;
             z-index: -1
         }
@@ -90,6 +91,10 @@
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
 
+            var FoVslider = document.getElementById("myFoV");
+            var FoVoutput = document.getElementById("FoVdemo");
+
+
             updateScreen(SVG(draw));
 
             var canvas = document.getElementById("canvas")
@@ -105,15 +110,31 @@
                 updateScreen(SVG(draw));
             }
 
+            FoVslider.oninput = function () {
+                redrawNestedlines(FoVslider.value,50,'#nl1')
+                redrawNestedlines(FoVslider.value,50,'#nl2')
+                updateScreen(SVG(draw));
+            }
+
         })
+
+        function redrawNestedlines(fov,no_lines,id){
+            document.getElementById("FoVdemo").innerHTML = fov
+            draw.find(id).clear()
+            var strokelength = window.innerWidth
+            for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
+            {
+                draw.find(id).line(30,0,strokelength+30,0).stroke({width:1, color:'#888'}).rotate(angle,30,0)
+            }
+        }
 
         function createNestedLines(fov,no_lines,id){
             var nested = draw.nested().id(id)
             var strokelength = window.innerWidth
-            initial_y = window.innerHeight/2
+            
             for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
             {
-                nested.line(30,initial_y,strokelength+30,initial_y).stroke({width:1, color:'#888'}).rotate(angle,30,initial_y).addTo(nested)
+                nested.line(30,0,strokelength+30,0).stroke({width:1, color:'#888'}).rotate(angle,30,0)
             }
         }
 
@@ -128,8 +149,8 @@
             drawsvg.find('path#vangle2').cy(drawsvg.find('circle#cam2').cy()[0])
             drawsvg.find('line#ml1').y(drawsvg.find('circle#cam1').cy()[0])
             drawsvg.find('line#ml2').y(drawsvg.find('circle#cam2').cy()[0])
-            drawsvg.find('#nl1').cy(drawsvg.find('circle#cam1').cy()[0]-window.innerHeight/2)
-            drawsvg.find('#nl2').cy(drawsvg.find('circle#cam2').cy()[0]-window.innerHeight/2)
+            drawsvg.find('#nl1').cy(drawsvg.find('circle#cam1').cy()[0])
+            drawsvg.find('#nl2').cy(drawsvg.find('circle#cam2').cy()[0])
             //document.getElementById('cam1').cx(slider.value)
             //draw.element('cam2').cy(slider.value)
             // screenupdater = setTimeout(UpdateScreen(),100)
@@ -141,7 +162,11 @@
 <body style="margin:0;overflow-y: hidden">
     <div class="slidecontainer">
         <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-        <p>Value: <span id="demo" style="position: relative;"></span></p>
+        <p>Distance: <span id="demo" style="position: relative;"></span></p>
+    </div>
+    <div class="slidecontainer" style="position: relative;">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myFoV">
+        <p>FoV: <span id="FoVdemo" style="position: relative;"></span></p>
     </div>
 
 </body>
