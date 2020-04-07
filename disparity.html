@@ -21,8 +21,7 @@
         #vangle1, #vangle2{
             visibility: hidden;
         }
-
-        
+     
 
         .slidecontainer {
             width: 100%;
@@ -69,6 +68,7 @@
         //slider from: https://www.w3schools.com/howto/howto_js_rangeslider.asp
         var textsize = 200
         var draw
+
         SVG.on(document, 'DOMContentLoaded', function () {
             // var draw = SVG().addTo('body')
             
@@ -79,7 +79,6 @@
             vangle1.stroke({ color: '#f06', width: 0, linecap: 'round', linejoin: 'round' }).fill({color:'#333', opacity:'30%'}).id('vangle1')
             var vangle2 = vangle1.clone().id('vangle2').addTo(draw)
             //draw.add(vangle2)
-
 
             var measure_line1 = draw.line(30,0,100,100).stroke({width:1, color:'#A00'}).move(cam1.x,cam1.y).id('ml1')
 
@@ -94,7 +93,6 @@
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
 
-
             updateScreen(SVG(draw));
 
             var canvas = document.getElementById("canvas")
@@ -103,6 +101,9 @@
                 var y = event.y;
                 measure_line1.plot(30,draw.find('circle#cam1').cy()[0],x,y)
                 measure_line2.plot(30,draw.find('circle#cam2').cy()[0],x,y)
+                deg_rad_cam1 = Math.atan2(x-draw.find('circle#cam1').cx()[0],y-draw.find('circle#cam1').cy()[0])
+                document.getElementById("angle").innerHTML = 90-(deg_rad_cam1 * 180 / Math.PI)
+
             }
 
             slider.oninput = function () {
@@ -124,7 +125,7 @@
             var strokelength = window.innerWidth
             for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
             {
-                draw.find(id).line(30,0,strokelength+30,0).stroke({width:1, color:'#888'}).rotate(angle,30,0)
+                draw.find(id).line(30,0,strokelength+30,0).stroke({width:1, color:'#CCC','stroke-opacity':0.2}).rotate(angle,30,0)
             }
         }
 
@@ -134,7 +135,7 @@
             
             for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
             {
-                nested.line(30,0,strokelength+30,0).stroke({width:1, color:'#888'}).rotate(angle,30,0)
+                nested.line(30,0,strokelength+30,0).stroke({width:1, color:'#CCC','stroke-opacity':0.2}).rotate(angle,30,0)
             }
         }
 
@@ -168,6 +169,7 @@
         <input type="range" min="1" max="100" value="50" class="slider" id="myFoV">
         <p>FoV: <span id="FoVdemo" style="position: relative;"></span></p>
     </div>
+    <div>angle1: <span id="angle">0</span></div>
 
 </body>
 
