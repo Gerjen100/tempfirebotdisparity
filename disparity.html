@@ -183,6 +183,7 @@
             {   
                 var l = 200 //linelength
                 var circlesize = 5;
+                var polylist = []
                 distance=Number(distance)
                 nested_svg.clear();
                 line1StartX = 0;
@@ -197,10 +198,15 @@
                     line2EndX = (l*Math.cos(Math.PI*angles2[a2_index]/180))
                     line2EndY = (l*Math.sin(Math.PI*angles2[a2_index]/180))+distance 
                     results = checkLineIntersection(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY)
-                    nested_svg.circle(circlesize).move(results.x-circlesize/2,results.y-circlesize/2).fill('#550')
+                    if(a1_index != a2_index)
+                        nested_svg.circle(circlesize).move(results.x-circlesize/2,results.y-circlesize/2).fill('#550');
+                    polylist.push([results.x,results.y])
                     }
                 }
-
+                //swap elements to get a good polygon
+                //https://stackoverflow.com/questions/872310/javascript-swap-array-elements
+                //[polylist[1],polylist[2]]=[polylist[2],polylist[1]]
+                nested_svg.polygon([polylist[0],polylist[2],polylist[3],polylist[1]]).fill("#3A3")
                 //angles1=[45,45]
 
 
