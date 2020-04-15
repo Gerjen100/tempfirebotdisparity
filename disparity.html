@@ -25,6 +25,15 @@
 
             set pixels(pixels) {
                 this._pixels = pixels
+                this._svg.clear()
+                this.createSvg()
+            }
+
+            set fov(fov){
+                this._fov = fov
+                this._svg.clear()
+                //TODO: just change rotation angle.Faster?
+                this.createSvg()
             }
             
             get nested_svg(){
@@ -66,6 +75,7 @@
             var cam1 = draw.circle(20).fill('#333').move(20, 20).id('cam1')
             var cam2 = draw.circle(20).fill('#333').move(20, 20).id('cam2')
             var cam3 = new Camera(draw.nested())
+        
             cam3.nested_svg.move(100,100)
 
 
@@ -88,7 +98,7 @@
             canvas.onmousemove = function (event) {
                 var x = event.x;
                 var y = event.y;
-                measure_line1.plot(30, draw.find('circle#cam1').cy()[0], x, y)
+                measure_line1.plot(cam3.nested_svg.x(), cam3.nested_svg.y(), x, y)
                 measure_line2.plot(30, draw.find('circle#cam2').cy()[0], x, y)
                 deg_rad_cam1 = Math.atan2(x - draw.find('circle#cam1').cx()[0], y - draw.find('circle#cam1').cy()[0])
                 document.getElementById("angle").innerHTML = 90 - (deg_rad_cam1 * 180 / Math.PI)
@@ -103,6 +113,7 @@
             FoVslider.oninput = function () {
                 redrawNestedlines(FoVslider.value, 50, '#nl1')
                 redrawNestedlines(FoVslider.value, 50, '#nl2')
+                cam3.fov=FoVslider.value
                 updateScreen(SVG(draw));
             }
 
