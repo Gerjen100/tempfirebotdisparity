@@ -3,72 +3,52 @@
 
 <head>
     <title>Disparity</title>
-    <style>
-        #controls {
-            position: absolute;
-            top: 5px;
-            left: 20px;
-            z-index: 10;
-        }
+    <link rel="stylesheet" type="text/css" href="camerastyle.css">
 
-        SVG {
-            position: absolute;
-            overflow: visible;
-            top: 0;
-            z-index: -1
-        }
-
-        #vangle1, #vangle2{
-            visibility: hidden;
-        }
-     
-
-        .slidecontainer {
-            width: 100%;
-        }
-
-        .slider {
-            -webkit-appearance: none;
-            width: 20%;
-            height: 15px;
-            border-radius: 5px;
-            background: #d3d3d3;
-            outline: none;
-            opacity: 0.7;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-            position: absolute;
-            top: 5px;
-        }
-
-        .slider:hover {
-            opacity: 1;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: pointer;
-        }
-
-        .slider::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: pointer;
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
     <script lang="javascript">
         //slider from: https://www.w3schools.com/howto/howto_js_rangeslider.asp
         var textsize = 200
         var draw
+        
+        class Camera{
+            constructor(nested_svg,fov,pixels)
+            {
+                this._fov = fov || 50;
+                this._pixels = pixels || 20
+                this._svg=nested_svg
+            }
 
+            get pixels(){
+                return this._pixels;
+            }
+
+            set pixels( pixels ){
+                this._pixels = pixels
+            }
+
+            createSvg()
+            {
+                var cam1 = _svg.circle(20).fill('#333').move(20, 20).id('cam')
+            }
+            
+        }
+
+        
+        class DisparityViz{
+            constructor(distance, options)
+            {
+                //https://www.markhansen.co.nz/javascript-optional-parameters/
+                this._options = options || {};
+                this._options.fov = options.fov || 50;
+                this._options.pixels = options.pixels || 20;
+                this._options.distance = options.distance || 100
+                cam1 = new Camera(this.options.fov,this.options.pixels)
+                cam2 = new Camera(this.options.fov,this.options.pixels)
+            }
+
+        }
+         
         SVG.on(document, 'DOMContentLoaded', function () {
             // var draw = SVG().addTo('body')
             
