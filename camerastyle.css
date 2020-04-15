@@ -12,10 +12,23 @@ SVG {
     z-index: -1
 }
 
-#vangle1, #vangle2{
-    visibility: hidden;
+.measureline {
+    stroke: #A00;
+    stroke-width: 1;
+    stroke-opacity:0 
 }
 
+.pixelline {
+   stroke-width: 1;
+   stroke-opacity: 0.2;
+   stroke: #333;
+}
+
+.pixelline_highlight {
+    stroke-width: 1;
+    stroke-opacity: 1;
+    stroke: #333;
+ }
 
 .slidecontainer {
     width: 100%;

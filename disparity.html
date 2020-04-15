@@ -14,9 +14,9 @@
         class Camera {
                 //https://www.markhansen.co.nz/javascript-optional-parameters/
 
-            constructor(nested_svg, fov, pixels) {
-                this._fov = fov || 50;
-                this._pixels = pixels || 20
+            constructor(nested_svg,options) {
+                this._fov = options.fov || 50;
+                this._pixels = options.pixels || 20
                 this._svg = nested_svg
                 this.createSvg()
             }
@@ -38,6 +38,10 @@
                 this.createSvg()
             }
             
+            get fov(){
+                return this._fov;
+            }
+
             get nested_svg(){
                 return this._svg
             }
@@ -49,9 +53,28 @@
 
             createNestedLines() {
                 var strokelength = window.innerWidth
-                for (let angle = this._fov / -2; angle <= this._fov / 2; angle += this._fov / this._pixels) {
-                    this._svg.line(0, 0, strokelength, 0).stroke({ width: 1, color: '#CCC', 'stroke-opacity': 0.2 }).rotate(angle, 0, 0)
+                var lines = this._svg.group()
+                for (let angle = this.fov / -2; angle <= this.fov / 2; angle += this.fov / this._pixels) {
+                    lines.line(0, 0, strokelength, 0).addClass('pixelline').rotate(angle, 0, 0)
                 }
+            }
+
+            highlight(angle){
+                // helper variable to only calculate from 0-fov degrees
+                var angle_positive = angle + this.fov/2
+                //remove existing highlights
+                var lines_list = this._svg.find('.pixelline_highlight')
+                lines_list.removeClass('pixelline_highlight')
+                if(angle_positive > this.fov || angle_positive < 0)
+                    //outside field of view
+                    return;
+                else{
+                    var index = Math.floor(angle_positive/this.fov*this.pixels)
+                    console.log(index);
+                    this.nested_svg.children()[1].children()[index].addClass('pixelline_highlight')
+                    this.nested_svg.children()[1].children()[index+1].addClass('pixelline_highlight')
+                }
+
             }
 
         }
@@ -59,27 +82,26 @@
         SVG.on(document, 'DOMContentLoaded', function () {
             // var draw = SVG().addTo('body')
 
-            draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
-
-            var cam1 = new Camera(draw.nested())
-            var cam2 = new Camera(draw.nested())
-        
-            cam1.nested_svg.move(100,100)
-            cam2.nested_svg.move(100,100)
-
-
-            var measure_line1 = draw.line(30, 0, 100, 100).stroke({ width: 1, color: '#A00' }).move(cam1.nested_svg.x(), cam1.nested_svg.y()).id('ml1')
-
-            var measure_line2 = draw.line(30, 0, 100, 100).stroke({ width: 1, color: '#A00' }).move(cam2.nested_svg.x(), cam2.nested_svg.y()).id('ml2')
-
-
-
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
 
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
+            var x_offset  =30
+            var no_of_pixels = 200
 
+
+            draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
+
+            var cam1 = new Camera(draw.nested(),{fov:FoVslider.value,pixels:no_of_pixels})
+            var cam2 = new Camera(draw.nested(),{fov:FoVslider.value,pixels:no_of_pixels})
+        
+            cam1.nested_svg.move(x_offset,100)
+            cam2.nested_svg.move(x_offset,100)
+
+
+            var measure_line1 = draw.line(x_offset, 0, 100, 100).addClass('measureline').move(cam1.nested_svg.x(), cam1.nested_svg.y()).id('ml1')
+            var measure_line2 = draw.line(x_offset, 0, 100, 100).addClass('measureline').move(cam2.nested_svg.x(), cam2.nested_svg.y()).id('ml2')
             updateScreen(SVG(draw),cam1,cam2);
 
             var canvas = document.getElementById("canvas")
@@ -88,8 +110,11 @@
                 var y = event.y;
                 measure_line1.plot(cam1.nested_svg.x(), cam1.nested_svg.y(), x, y)
                 measure_line2.plot(cam2.nested_svg.x(), cam2.nested_svg.y(), x, y)
-                deg_rad_cam1 = Math.atan2(x - cam1.nested_svg.x(), y -cam1.nested_svg.y())
-                document.getElementById("angle").innerHTML = 90 - (deg_rad_cam1 * 180 / Math.PI)
+                angle_deg_cam1 = 90 -( Math.atan2(x - cam1.nested_svg.x(), y -cam1.nested_svg.y())* 180 / Math.PI)
+                angle_deg_cam2 = 90 -( Math.atan2(x - cam2.nested_svg.x(), y -cam2.nested_svg.y())* 180 / Math.PI)
+                cam1.highlight(angle_deg_cam1)
+                cam2.highlight(angle_deg_cam2)
+                document.getElementById("angle").innerHTML = angle_deg_cam1
 
             }
 
