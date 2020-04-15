@@ -10,59 +10,71 @@
         //slider from: https://www.w3schools.com/howto/howto_js_rangeslider.asp
         var textsize = 200
         var draw
-        
-        class Camera{
-            constructor(nested_svg,fov,pixels)
-            {
+
+        class Camera {
+            constructor(nested_svg, fov, pixels) {
                 this._fov = fov || 50;
                 this._pixels = pixels || 20
-                this._svg=nested_svg
+                this._svg = nested_svg
+                this.createSvg()
             }
 
-            get pixels(){
+            get pixels() {
                 return this._pixels;
             }
 
-            set pixels( pixels ){
+            set pixels(pixels) {
                 this._pixels = pixels
             }
-
-            createSvg()
-            {
-                var cam1 = _svg.circle(20).fill('#333').move(20, 20).id('cam')
-            }
             
+            get nested_svg(){
+                return this._svg
+            }
+
+            createSvg() {
+                var cam1 = this._svg.circle(20).move(-10, -10).fill('#F00').id('cam')
+                this.createNestedLines();
+            }
+
+            createNestedLines() {
+                var strokelength = window.innerWidth
+                for (let angle = this._fov / -2; angle <= this._fov / 2; angle += this._fov / this._pixels) {
+                    this._svg.line(0, 0, strokelength, 0).stroke({ width: 1, color: '#CCC', 'stroke-opacity': 0.2 }).rotate(angle, 0, 0)
+                }
+            }
+
         }
 
-        
-        class DisparityViz{
-            constructor(distance, options)
-            {
+
+        class DisparityViz {
+            constructor(distance, options) {
                 //https://www.markhansen.co.nz/javascript-optional-parameters/
                 this._options = options || {};
                 this._options.fov = options.fov || 50;
                 this._options.pixels = options.pixels || 20;
                 this._options.distance = options.distance || 100
-                cam1 = new Camera(this.options.fov,this.options.pixels)
-                cam2 = new Camera(this.options.fov,this.options.pixels)
+                cam1 = new Camera(this.options.fov, this.options.pixels)
+                cam2 = new Camera(this.options.fov, this.options.pixels)
             }
 
         }
-         
+
         SVG.on(document, 'DOMContentLoaded', function () {
             // var draw = SVG().addTo('body')
-            
+
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
             var cam1 = draw.circle(20).fill('#333').move(20, 20).id('cam1')
             var cam2 = draw.circle(20).fill('#333').move(20, 20).id('cam2')
+            var cam3 = new Camera(draw.nested())
+            cam3.nested_svg.move(100,100)
 
 
-            var measure_line1 = draw.line(30,0,100,100).stroke({width:1, color:'#A00'}).move(cam1.x,cam1.y).id('ml1')
+            var measure_line1 = draw.line(30, 0, 100, 100).stroke({ width: 1, color: '#A00' }).move(cam1.x, cam1.y).id('ml1')
 
-            var measure_line2 = draw.line(30,0,100,100).stroke({width:1, color:'#A00'}).move(cam1.x,cam1.y).id('ml2')
+            var measure_line2 = draw.line(30, 0, 100, 100).stroke({ width: 1, color: '#A00' }).move(cam1.x, cam1.y).id('ml2')
 
-            createNestedLines(50,50,'nl1')
-            createNestedLines(50,50,'nl2')
+            createNestedLines(50, 50, 'nl1')
+            createNestedLines(50, 50, 'nl2')
 
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
@@ -73,56 +85,54 @@
             updateScreen(SVG(draw));
 
             var canvas = document.getElementById("canvas")
-            canvas.onmousemove = function(event){
+            canvas.onmousemove = function (event) {
                 var x = event.x;
                 var y = event.y;
-                measure_line1.plot(30,draw.find('circle#cam1').cy()[0],x,y)
-                measure_line2.plot(30,draw.find('circle#cam2').cy()[0],x,y)
-                deg_rad_cam1 = Math.atan2(x-draw.find('circle#cam1').cx()[0],y-draw.find('circle#cam1').cy()[0])
-                document.getElementById("angle").innerHTML = 90-(deg_rad_cam1 * 180 / Math.PI)
+                measure_line1.plot(30, draw.find('circle#cam1').cy()[0], x, y)
+                measure_line2.plot(30, draw.find('circle#cam2').cy()[0], x, y)
+                deg_rad_cam1 = Math.atan2(x - draw.find('circle#cam1').cx()[0], y - draw.find('circle#cam1').cy()[0])
+                document.getElementById("angle").innerHTML = 90 - (deg_rad_cam1 * 180 / Math.PI)
 
             }
 
             slider.oninput = function () {
-                
+
                 updateScreen(SVG(draw));
             }
 
             FoVslider.oninput = function () {
-                redrawNestedlines(FoVslider.value,50,'#nl1')
-                redrawNestedlines(FoVslider.value,50,'#nl2')
+                redrawNestedlines(FoVslider.value, 50, '#nl1')
+                redrawNestedlines(FoVslider.value, 50, '#nl2')
                 updateScreen(SVG(draw));
             }
 
         })
 
-        function redrawNestedlines(fov,no_lines,id){
+        function redrawNestedlines(fov, no_lines, id) {
             document.getElementById("FoVdemo").innerHTML = fov
             draw.find(id).clear()
             var strokelength = window.innerWidth
-            for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
-            {
-                draw.find(id).line(30,0,strokelength+30,0).stroke({width:1, color:'#CCC','stroke-opacity':0.2}).rotate(angle,30,0)
+            for (angle = fov / -2; angle <= fov / 2; angle += fov / no_lines) {
+                draw.find(id).line(30, 0, strokelength + 30, 0).stroke({ width: 1, color: '#CCC', 'stroke-opacity': 0.2 }).rotate(angle, 30, 0)
             }
         }
 
-        function createNestedLines(fov,no_lines,id){
+        function createNestedLines(fov, no_lines, id) {
             var nested = draw.nested().id(id)
             var strokelength = window.innerWidth
-            
-            for(angle = fov/-2; angle <= fov/2 ; angle += fov/no_lines)
-            {
-                nested.line(30,0,strokelength+30,0).stroke({width:1, color:'#CCC','stroke-opacity':0.2}).rotate(angle,30,0)
+
+            for (angle = fov / -2; angle <= fov / 2; angle += fov / no_lines) {
+                nested.line(30, 0, strokelength + 30, 0).stroke({ width: 1, color: '#CCC', 'stroke-opacity': 0.2 }).rotate(angle, 30, 0)
             }
         }
 
         function updateScreen(drawsvg) {
-            
+
             var output = document.getElementById("demo");
             var slider = document.getElementById("myRange");
             var slidevalue = output.innerHTML = slider.value;
-            drawsvg.find('circle#cam1').cy((window.innerHeight/2)-slidevalue)
-            drawsvg.find('circle#cam2').cy((window.innerHeight/2)+slidevalue*1)
+            drawsvg.find('circle#cam1').cy((window.innerHeight / 2) - slidevalue)
+            drawsvg.find('circle#cam2').cy((window.innerHeight / 2) + slidevalue * 1)
             drawsvg.find('line#ml1').y(drawsvg.find('circle#cam1').cy()[0])
             drawsvg.find('line#ml2').y(drawsvg.find('circle#cam2').cy()[0])
             drawsvg.find('#nl1').cy(drawsvg.find('circle#cam1').cy()[0])
