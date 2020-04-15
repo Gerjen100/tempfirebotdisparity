@@ -140,7 +140,7 @@
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
             var x_offset = 30
-            var no_of_pixels = 200
+            var no_of_pixels = 320
 
 
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
@@ -175,7 +175,7 @@
                 else
                     intersections.clear(); //remove dots
 
-                document.getElementById("angle").innerHTML = angle_deg_cam1
+                document.getElementById("angle").innerHTML = angle_deg_cam1.toFixed(2)
 
             }
 
@@ -204,13 +204,10 @@
                     }
                 }
                 //swap elements to get a good polygon
-                //https://stackoverflow.com/questions/872310/javascript-swap-array-elements
-                //[polylist[1],polylist[2]]=[polylist[2],polylist[1]]
                 nested_svg.polygon([polylist[0],polylist[2],polylist[3],polylist[1]]).fill("#3A3")
-                //angles1=[45,45]
-
-
-
+                //TODO: this needs to get set from another function. Maybe pass back to calling function?
+                document.getElementById('depth_uncertainty').innerHTML = Math.sqrt((polylist[1][0]-polylist[2][0])**2+(polylist[1][1]-polylist[2][1])**2).toFixed(2)
+                document.getElementById('depth').innerHTML = Math.sqrt((polylist[0][0])**2+(polylist[0][1]**2)).toFixed(2)
                 //nested_svg.line([line1StartX,line1StartY,line1EndX,line1EndY]).stroke({color:"#FF0"})
                 //nested_svg.line([line2StartX,line2StartY,line2EndX,line2EndY]).stroke({color:"#F0F"})
                 //nested_svg.circle(circlesize).move(line1EndX,line1EndY).fill('#000')
@@ -226,6 +223,7 @@
                 cam1.fov = FoVslider.value
                 cam2.fov = FoVslider.value
                 updateScreen(SVG(draw), cam1, cam2);
+                FoVoutput.innerHTML = FoVslider.value
             }
 
         })
@@ -235,7 +233,9 @@
 
             var output = document.getElementById("demo");
             var slider = document.getElementById("myRange");
-            var slidevalue = output.innerHTML = slider.value;
+            var slidevalue = slider.value;
+            //because value is used for up and down, displayed value should be twice as big
+            output.innerHTML = slider.value * 2
             cam1.nested_svg.y((window.innerHeight / 2) - slidevalue * 1)
             cam2.nested_svg.y((window.innerHeight / 2) + slidevalue * 1)
 
@@ -260,6 +260,7 @@
         <p>FoV: <span id="FoVdemo" style="position: relative;"></span></p>
     </div>
     <div>angle1: <span id="angle">0</span></div>
+    <div>depth uncertainty: <span id="depth_uncertainty">0</span> at depth: <span id="depth"> 0</span></div>
 
 </body>
 
