@@ -136,9 +136,11 @@
 
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
+            var pixelinput = document.getElementById("pixels")
 
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
+            FoVoutput.innerHTML = FoVslider.value
             var x_offset = 30
             var no_of_pixels = 320
 
@@ -175,7 +177,7 @@
                 else
                     intersections.clear(); //remove dots
 
-                document.getElementById("angle").innerHTML = angle_deg_cam1.toFixed(2)
+                //document.getElementById("angle").innerHTML = angle_deg_cam1.toFixed(2)
 
             }
 
@@ -219,6 +221,14 @@
                 updateScreen(SVG(draw), cam1, cam2);
             }
 
+            
+            pixelinput.onchange = function () {
+                no_of_pixels = pixelinput.value
+
+                cam1.pixels = no_of_pixels
+                cam2.pixels = no_of_pixels
+            }
+
             FoVslider.oninput = function () {
                 cam1.fov = FoVslider.value
                 cam2.fov = FoVslider.value
@@ -257,10 +267,17 @@
     </div>
     <div class="slidecontainer" style="position: relative;">
         <input type="range" min="1" max="100" value="50" class="slider" id="myFoV">
-        <p>FoV: <span id="FoVdemo" style="position: relative;"></span></p>
+        <p>FoV: <span id="FoVdemo" style="position: relative;"></span>&deg;</p>
     </div>
-    <div>angle1: <span id="angle">0</span></div>
+    <!--<form class="form-inline" >-->
+        <label for="pixels">Number of pixels:</label>
+        <input type="pixels" id="pixels"  name="pizels" value=320>
+      
+    <!--  </form>-->
+      
+    <!--<div>angle1: <span id="angle">0</span></div>-->
     <div>depth uncertainty: <span id="depth_uncertainty">0</span> at depth: <span id="depth"> 0</span></div>
+
 
 </body>
 
