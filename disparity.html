@@ -116,7 +116,7 @@
 
             highlight(angle) {
                 // helper variable to only calculate from 0-fov degrees
-                var angle_positive = angle + this._fov / 2
+                var angle_positive = -this._camrotation + angle + this._fov / 2 
                 //remove existing highlights
                 var lines_list = this._svg.find('.pixelline_highlight')
                 lines_list.removeClass('pixelline_highlight')
@@ -132,8 +132,8 @@
                     var line2 = this.nested_svg.children()[1].children()[index + 1]
                     line1.addClass('pixelline_highlight')
                     line2.addClass('pixelline_highlight')
-                    var l1angle = (-this._fov/2) + (index/this.pixels)*(this.fov)
-                    var l2angle = (-this._fov/2) + ((index+1)/this.pixels)*(this.fov)
+                    var l1angle = this._camrotation + (-this._fov/2) + (index/this.pixels)*(this.fov)
+                    var l2angle = this._camrotation + (-this._fov/2) + ((index+1)/this.pixels)*(this.fov)
                     return ([l1angle,l2angle])
 
                 }
