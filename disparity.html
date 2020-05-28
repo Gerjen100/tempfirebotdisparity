@@ -66,6 +66,16 @@
                 this.createSvg()
             }
 
+            get camrotation(){
+                return this._camrotation
+            }
+
+            set camrotation(rot){
+                this._camrotation = rot;
+                this._svg.clear()
+                this.createSvg()
+            }
+
             get pixels() {
                 return this._pixels;
             }
@@ -100,7 +110,7 @@
                 var strokelength = window.innerWidth
                 var lines = this._svg.group()
                 for (let angle = this.fov / -2; angle <= this.fov / 2; angle += this.fov / this._pixels) {
-                    lines.line(0, 0, strokelength, 0).addClass('pixelline').rotate(angle, 0, 0)
+                    lines.line(0, 0, strokelength, 0).addClass('pixelline').rotate(angle + this._camrotation, 0, 0)
                 }
             }
 
@@ -243,6 +253,8 @@
             }
 
             CamRotationslider.oninput = function(){
+                cam1.camrotation = Number(CamRotationslider.value)*-1
+                cam2.camrotation = Number(CamRotationslider.value)
                 CamRotationoutput.innerHTML = CamRotationslider.value
             }
 
