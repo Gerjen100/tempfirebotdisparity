@@ -59,6 +59,7 @@
             //https://www.markhansen.co.nz/javascript-optional-parameters/
 
             constructor(nested_svg, options) {
+                this._camrotation = options.camrotation || 0;
                 this._fov = options.fov || 50;
                 this._pixels = options.pixels || 20
                 this._svg = nested_svg
@@ -140,15 +141,20 @@
 
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
+
+            var CamRotationslider = document.getElementById("cam_rotation");
+            var CamRotationoutput = document.getElementById("cam_rotation_text");
+
             FoVoutput.innerHTML = FoVslider.value
+            CamRotationoutput.innerHTML = CamRotationslider.value
             var x_offset = 30
             var no_of_pixels = 320
 
 
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
 
-            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels })
-            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels })
+            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels , camrotation: CamRotationslider.value })
+            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels, camrotation:  -CamRotationslider.value })
             var intersections = draw.nested();
 
             cam1.nested_svg.move(x_offset, 100)
@@ -236,6 +242,10 @@
                 FoVoutput.innerHTML = FoVslider.value
             }
 
+            CamRotationslider.oninput = function(){
+                CamRotationoutput.innerHTML = CamRotationslider.value
+            }
+
         })
 
 
@@ -268,6 +278,10 @@
     <div class="slidecontainer" style="position: relative;">
         <input type="range" min="1" max="100" value="50" class="slider" id="myFoV">
         <p>FoV: <span id="FoVdemo" style="position: relative;"></span>&deg;</p>
+    </div>
+    <div class="slidecontainer" style="position: relative;">
+        <input type="range" min="-10" max="10" value="0" class="slider" id="cam_rotation">
+        <p>Camera rotation: <span id="cam_rotation_text" style="position: relative;"></span>&deg;</p>
     </div>
     <!--<form class="form-inline" >-->
         <label for="pixels">Number of pixels:</label>
