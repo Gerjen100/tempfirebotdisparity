@@ -59,9 +59,20 @@
             //https://www.markhansen.co.nz/javascript-optional-parameters/
 
             constructor(nested_svg, options) {
+                this._camrotation = options.camrotation || 0;
                 this._fov = options.fov || 50;
                 this._pixels = options.pixels || 20
                 this._svg = nested_svg
+                this.createSvg()
+            }
+
+            get camrotation(){
+                return this._camrotation
+            }
+
+            set camrotation(rot){
+                this._camrotation = rot;
+                this._svg.clear()
                 this.createSvg()
             }
 
@@ -99,17 +110,17 @@
                 var strokelength = window.innerWidth
                 var lines = this._svg.group()
                 for (let angle = this.fov / -2; angle <= this.fov / 2; angle += this.fov / this._pixels) {
-                    lines.line(0, 0, strokelength, 0).addClass('pixelline').rotate(angle, 0, 0)
+                    lines.line(0, 0, strokelength, 0).addClass('pixelline').rotate(angle + this._camrotation, 0, 0)
                 }
             }
 
             highlight(angle) {
                 // helper variable to only calculate from 0-fov degrees
-                var angle_positive = angle + this.fov / 2
+                var angle_positive = -this._camrotation + angle + this._fov / 2 
                 //remove existing highlights
                 var lines_list = this._svg.find('.pixelline_highlight')
                 lines_list.removeClass('pixelline_highlight')
-                if (angle_positive > this.fov || angle_positive < 0)
+                if (angle_positive > this._fov || angle_positive < 0)
                     //outside field of view
                     return;
                 else {
@@ -121,8 +132,8 @@
                     var line2 = this.nested_svg.children()[1].children()[index + 1]
                     line1.addClass('pixelline_highlight')
                     line2.addClass('pixelline_highlight')
-                    var l1angle = (-this.fov/2) + (index/this.pixels)*(this.fov)
-                    var l2angle = (-this.fov/2) + ((index+1)/this.pixels)*(this.fov)
+                    var l1angle = this._camrotation + (-this._fov/2) + (index/this.pixels)*(this.fov)
+                    var l2angle = this._camrotation + (-this._fov/2) + ((index+1)/this.pixels)*(this.fov)
                     return ([l1angle,l2angle])
 
                 }
@@ -140,15 +151,20 @@
 
             var FoVslider = document.getElementById("myFoV");
             var FoVoutput = document.getElementById("FoVdemo");
+
+            var CamRotationslider = document.getElementById("cam_rotation");
+            var CamRotationoutput = document.getElementById("cam_rotation_text");
+
             FoVoutput.innerHTML = FoVslider.value
+            CamRotationoutput.innerHTML = CamRotationslider.value
             var x_offset = 30
             var no_of_pixels = 320
 
 
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
 
-            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels })
-            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels })
+            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels , camrotation: Number(CamRotationslider.value) })
+            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels, camrotation:  -Number(CamRotationslider.value) })
             var intersections = draw.nested();
 
             cam1.nested_svg.move(x_offset, 100)
@@ -236,6 +252,12 @@
                 FoVoutput.innerHTML = FoVslider.value
             }
 
+            CamRotationslider.oninput = function(){
+                cam1.camrotation = Number(CamRotationslider.value)*-1
+                cam2.camrotation = Number(CamRotationslider.value)
+                CamRotationoutput.innerHTML = CamRotationslider.value
+            }
+
         })
 
 
@@ -268,6 +290,10 @@
     <div class="slidecontainer" style="position: relative;">
         <input type="range" min="1" max="100" value="50" class="slider" id="myFoV">
         <p>FoV: <span id="FoVdemo" style="position: relative;"></span>&deg;</p>
+    </div>
+    <div class="slidecontainer" style="position: relative;">
+        <input type="range" min="-10" max="10" value="0" class="slider" id="cam_rotation">
+        <p>Camera rotation: <span id="cam_rotation_text" style="position: relative;"></span>&deg;</p>
     </div>
     <!--<form class="form-inline" >-->
         <label for="pixels">Number of pixels:</label>
