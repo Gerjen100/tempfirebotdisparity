@@ -116,11 +116,11 @@
 
             highlight(angle) {
                 // helper variable to only calculate from 0-fov degrees
-                var angle_positive = angle + this.fov / 2
+                var angle_positive = angle + this._fov / 2
                 //remove existing highlights
                 var lines_list = this._svg.find('.pixelline_highlight')
                 lines_list.removeClass('pixelline_highlight')
-                if (angle_positive > this.fov || angle_positive < 0)
+                if (angle_positive > this._fov || angle_positive < 0)
                     //outside field of view
                     return;
                 else {
@@ -132,8 +132,8 @@
                     var line2 = this.nested_svg.children()[1].children()[index + 1]
                     line1.addClass('pixelline_highlight')
                     line2.addClass('pixelline_highlight')
-                    var l1angle = (-this.fov/2) + (index/this.pixels)*(this.fov)
-                    var l2angle = (-this.fov/2) + ((index+1)/this.pixels)*(this.fov)
+                    var l1angle = (-this._fov/2) + (index/this.pixels)*(this.fov)
+                    var l2angle = (-this._fov/2) + ((index+1)/this.pixels)*(this.fov)
                     return ([l1angle,l2angle])
 
                 }
@@ -163,8 +163,8 @@
 
             draw = SVG().addTo('body').size(window.innerWidth, window.innerHeight).id('canvas');
 
-            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels , camrotation: CamRotationslider.value })
-            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels, camrotation:  -CamRotationslider.value })
+            var cam1 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels , camrotation: Number(CamRotationslider.value) })
+            var cam2 = new Camera(draw.nested(), { fov: FoVslider.value, pixels: no_of_pixels, camrotation:  -Number(CamRotationslider.value) })
             var intersections = draw.nested();
 
             cam1.nested_svg.move(x_offset, 100)
